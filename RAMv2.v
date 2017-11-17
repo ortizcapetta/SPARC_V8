@@ -74,10 +74,11 @@ module ram512x8_tester;
 	reg[8:0] Address;
 	reg[5:0]OP;
 	
-
+	//calling the RAM module
 	ram512x8 RAM(DataOut,MOC,ReadWrite,MOV,Address,DataIn,OP);
-
-
+	// just some stuff needed to read code from a text file
+	integer   fd,fo, code, index;
+	reg [7:0] data;
 
 
 	initial begin
@@ -137,6 +138,39 @@ module ram512x8_tester;
 		#10
 		$display("Loading Byte.\nDataOut is: %b", DataOut);
 
-	
+
+		$display("--LOADING TEST PROGRAM INTO RAM--");
+		fo = $fopen("RAMTEST.txt","r"); 
+		index = 0;
+		while (!$feof(fo)) begin
+
+			code = $fscanf(fo, "%b", data);
+			RAM.Mem[index]=data;
+			index = index + 1;
+		end
+	  	$fclose(fo);
+	  	$display("--TEST PROGRAM LOADED--");
+	  	$display("%b",RAM.Mem[0]);
+	  	$display("%b",RAM.Mem[1]);
+	  	#20
+	  	MOV=0;MOV=1;
+		ReadWrite=1;
+		Address=0;		
+		OP=6'b001000;
+		#10;
+		$display("Loading Instruction.\nDataOut is: %b", DataOut);
+		MOV=0;MOV=1;
+		ReadWrite=1;
+		Address=4;		
+		OP=6'b001000;
+		#10;
+		$display("Loading Instruction.\nDataOut is: %b", DataOut);
+
+
+
+
 	end
+	
+
+
 endmodule
