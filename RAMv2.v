@@ -1,13 +1,32 @@
+
+
+						/*			RAM 512x8                
+								by Alejandra Ortiz         */
 module ram512x8(output reg [31:0] DataOut, 
 				 output reg MOC,
 				 input ReadWrite, MOV,
-				 //replaced Enable with MOV 
 				 input[8:0] Address, //2^9 = 512
 				 input[31:0] DataIn,
 				 input [5:0] OP //determines if byte,word, halfword
 				); 
 	reg[7:0] Mem[0:511]; //512 locations with 1 byte each [512 bytes of memory total]
- 	
+
+			/*---------------------------PARAMETERS--------------------------|
+			|------------------------------OUTPUTS---------------------------|
+			|DataOut - Bus that provides data on a read Operation            |
+			|MOC(Memory Operation Completed) - tells the CPU when a memory   |
+			|	operation has been completed (1- completed)(0- not completed)|
+			|																 |
+			| ------------------------------INPUTS---------------------------|
+			|DataIn - Bus that receives data to be stored                    |
+			|Address - Bus for specifying the memory address                 |
+			|ReadWrite - Read & Write operation (1- Read) (0-Write)          |
+			|MOV(Memory Operation Valid) - Tells the CPU when a Memory       |
+			|	operation has been completed (1-completed)(0-not completed)  |
+			|OP - determines the type of the input to be saved (byte,word or |
+			|	halfword)      												 |
+			|----------------------------------------------------------------*/        									 
+
 	always @(MOV)
 		if(MOV)
 		begin
@@ -23,7 +42,7 @@ module ram512x8(output reg [31:0] DataOut,
 						end
 				//Unsigned Half-Word (16 bits)
 					6'b000010:begin
-						DataOut[31:16]  <= 16'h0000; //hexadecilam, 16 bits Mem[Address];
+						DataOut[31:16]  <= 16'h0000; //hexadecimal, 16 bits 
 						DataOut[15:8]  <= Mem[Address];
 						DataOut[7:0]   <= Mem[Address+1];
 						end
@@ -65,6 +84,7 @@ module ram512x8(output reg [31:0] DataOut,
 
 endmodule
 
+						/*Module for testing 512x8 RAM */
 module ram512x8_tester;
 	//  !!inputs are reg, outputs are wires !! 
 	wire[31:0] DataOut;
@@ -89,11 +109,11 @@ module ram512x8_tester;
 
 
 	initial begin
-		//Store Word
+		//writing word
 		OP=6'b000100;
 		DataIn =32'hAE910F2B;
-		# 10 //wait
-		$display("Adding Word %h to RAM",DataIn);
+		# 10
+		$display("Storing Word %h to RAM",DataIn); 
 		$display("Value in Address %b : %b",Address,RAM.Mem[Address]);
 		Address = Address + 1;
 		$display("Value in Address %b : %b",Address,RAM.Mem[Address]);
@@ -101,6 +121,7 @@ module ram512x8_tester;
 		$display("Value in Address %b : %b",Address,RAM.Mem[Address]);
 		Address = Address + 1;
 		$display("Value in Address %b : %b",Address,RAM.Mem[Address]);
+		//loading word
 		MOV=0;MOV=1;
 		ReadWrite=1;
 		Address=0;		
@@ -113,6 +134,7 @@ module ram512x8_tester;
 		OP=6'b000110;
 		DataIn=16'hAABB;
 		#10
+		//writing half-word
 		$display("Storing Half-World %h to RAM",DataIn);
 		$display("Value in Address %b : %b",Address,RAM.Mem[Address]);
 		Address = Address + 1;
@@ -122,8 +144,9 @@ module ram512x8_tester;
 		OP=6'b000010;
 		Address=4;
 		#10
+		//loading half word
 		$display("Loading half-word.\nDataOut is: %0b", DataOut);
-
+		//storing byte
 		Address=6;
 		MOV=0; MOV=1;
 		ReadWrite=0;
@@ -132,6 +155,7 @@ module ram512x8_tester;
 		#10
 		$display("Storing Byte %0b to RAM",DataIn);
 		$display("Value in Address %b : %b",Address,RAM.Mem[Address]);
+		//loading byte
 		MOV=0;MOV=1;
 		ReadWrite=1;
 		OP= 6'b000001;
