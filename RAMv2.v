@@ -164,7 +164,7 @@ module ram512x8_tester;
 
 
 		$display("--LOADING TEST PROGRAM INTO RAM--");
-		fo = $fopen("RAMTEST.txt","r"); 
+		fo = $fopen("RAMTEST.txt","r"); //RAMTEST.txt can be a file of two words for this specific program to read
 		index = 0;
 		while (!$feof(fo)) begin
 
